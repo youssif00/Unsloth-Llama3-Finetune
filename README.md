@@ -1,1 +1,102 @@
 # Unsloth-Llama3-Finetune
+# Fine-Tuning Llama 3.2 3B with Unsloth on Google Colab
+
+![Python](https://img.shields.io/badge/Python-3.10%2B-blue?style=for-the-badge&logo=python)
+![PyTorch](https://img.shields.io/badge/PyTorch-2.7.1-orange?style=for-the-badge&logo=pytorch)
+![Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Models%20%26%20Datasets-yellow?style=for-the-badge)
+![Google Colab](https://img.shields.io/badge/Google%20Colab-T4%20GPU-purple?style=for-the-badge&logo=googlecolab)
+
+This repository contains a Jupyter Notebook demonstrating how to efficiently fine-tune the `unsloth/Llama-3.2-3B-Instruct` model using the **Unsloth** library. The entire process is optimized to run on a free Google Colab T4 GPU, making advanced model customization accessible to everyone.
+
+## Overview
+
+The goal of this project is to perform Supervised Fine-Tuning (SFT) on a powerful, small-sized language model. We leverage several cutting-edge techniques to achieve this with minimal hardware requirements:
+
+- **Unsloth:** A library that significantly speeds up fine-tuning (by up to 2x) and reduces memory usage by patching Hugging Face transformers.
+- **QLoRA:** Quantization with Low-Rank Adapters allows us to fine-tune the model in 4-bit precision, drastically cutting down the VRAM footprint.
+- **Llama 3.2 3B:** A state-of-the-art 3-billion parameter model that offers a great balance between performance and resource requirements.
+- **FineTome-100k Dataset:** A high-quality, curated dataset of 100,000 instruction-response pairs for effective fine-tuning.
+
+## Key Features
+
+- **🚀 Fast & Efficient Training:** Fine-tunes a 3B parameter model in approximately **12 minutes** on a single T4 GPU.
+- **🧠 Parameter-Efficient Fine-Tuning (PEFT):** Uses LoRA adapters to train only a small fraction (0.75%) of the model's parameters, preserving the original model's knowledge while adapting it to new data.
+- **💬 Chat-Formatted Data:** The notebook properly formats the dataset into a chat template (`llama-3.1`) for instruction-following tasks.
+- **📊 Training Monitoring:** Integrated with Weights & Biases (`wandb`) for real-time tracking of training loss and other metrics.
+- ** reproducible:** The notebook is self-contained and can be run directly in a Google Colab environment.
+
+## Workflow
+
+The notebook follows a clear, step-by-step process:
+
+1.  **Environment Setup:** Installs necessary libraries (`unsloth`, `transformers`, `trl`, `datasets`) and configures the environment to be compatible with the Colab T4 GPU by disabling Flash Attention.
+2.  **Model Loading:** Loads the `unsloth/Llama-3.2-3B-Instruct` model and its tokenizer using Unsloth's `FastLanguageModel`, which automatically applies performance patches and loads the model in 4-bit precision.
+3.  **PEFT Configuration:** Injects LoRA adapters into the model's attention and MLP layers, making it ready for efficient training.
+4.  **Data Preparation:** Loads the `mlabonne/FineTome-100k` dataset, standardizes it to the ShareGPT format, and applies the Llama 3.1 chat template.
+5.  **Training:** Sets up and runs the `SFTTrainer` from the TRL library with optimized training arguments (batch size, learning rate, etc.) for 60 steps.
+6.  **Saving the Model:** Saves the trained LoRA adapters to a local directory (`finetuned_Llama_model`) for later use.
+
+## How to Run
+
+You can run this project directly in Google Colab.
+
+1.  **Open in Google Colab:**
+    [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/[YOUR_GITHUB_USERNAME]/[YOUR_REPOSITORY_NAME]/blob/main/Llama_Fine_tuning.ipynb)
+    > **Note:** Replace `[YOUR_GITHUB_USERNAME]/[YOUR_REPOSITORY_NAME]` with your actual GitHub details.
+
+2.  **Run the First Cell and Restart:**
+    The first code cell sets up the environment to be compatible with the T4 GPU. **You must run this cell first, wait for the runtime to restart automatically, and then proceed to run the rest of the cells from the top, skipping the first one.**
+
+3.  **Provide WandB API Key:**
+    When you run the training cell, you will be prompted to enter your Weights & Biases API key to log the training run. You can get your key from [wandb.ai/authorize](https://wandb.ai/authorize).
+
+4.  **Execute All Cells:**
+    Run the remaining cells in order to download the model, prepare the data, and start the fine-tuning process.
+
+## Results
+
+The model was trained for 60 steps on the `FineTome-100k` dataset.
+- **Training Time:** ~12 minutes on a T4 GPU.
+- **Final Training Loss:** The training loss successfully decreased, ending at approximately **0.8742**.
+
+This indicates that the model was learning effectively from the dataset.
+
+## Testing the Fine-Tuned Model
+
+The original notebook had a small bug where the `tokenizer` variable was overwritten. The following code block shows the corrected way to load your fine-tuned model and run inference.
+
+You can add this code to a new cell at the end of your notebook to test your model's responses.
+
+```python
+from transformers import AutoTokenizer, AutoModelForCausalLM
+import torch
+
+# Load the base model and tokenizer
+model_name = "unsloth/Llama-3.2-3B-Instruct"
+model = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype=torch.bfloat16, device_map="auto")
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+
+# Add the PEFT adapter
+from peft import PeftModel
+model = PeftModel.from_pretrained(model, "finetuned_Llama_model")
+
+# Set up the chat template
+messages = [
+    {"role": "system", "content": "You are a helpful, friendly assistant."},
+    {"role": "user", "content": "What are the three main benefits of using PyTorch?"},
+]
+
+# Apply the chat template and generate a response
+input_ids = tokenizer.apply_chat_template(messages, tokenize=True, add_generation_prompt=True, return_tensors="pt").to("cuda")
+outputs = model.generate(input_ids=input_ids, max_new_tokens=256, use_cache=True)
+response = tokenizer.batch_decode(outputs[:, input_ids.shape[1]:], skip_special_tokens=True)[0]
+
+print(response)
+```
+
+## Future Improvements
+
+- **Train for More Steps:** The model was only trained for 60 steps as a demonstration. Training for more epochs or steps would likely yield better performance.
+- **Merge and Save:** The LoRA adapters can be merged into the base model and saved as a single model for easier deployment.
+- **Push to Hub:** The fine-tuned model can be pushed to the Hugging Face Hub for sharing and community use.
+- **Evaluation:** Implement a formal evaluation pipeline using a separate test set to measure performance on metrics like ROUGE, BLEU, or accuracy on specific tasks.
