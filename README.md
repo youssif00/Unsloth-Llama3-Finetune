@@ -41,7 +41,7 @@ The notebook follows a clear, step-by-step process:
 You can run this project directly in Google Colab.
 
 1.  **Open in Google Colab:**
-    [![Open In Colab](https://colab.research.google.com/drive/1LXL1Q4aZ1OeJ2mH7L3XhmEEFmLU2KbyB#scrollTo=hHiKux2QEWjd)]
+    
 
 2.  **Run the First Cell and Restart:**
     The first code cell sets up the environment to be compatible with the T4 GPU. **You must run this cell first, wait for the runtime to restart automatically, and then proceed to run the rest of the cells from the top, skipping the first one.**
