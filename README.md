@@ -60,38 +60,7 @@ The model was trained for 60 steps on the `FineTome-100k` dataset.
 
 This indicates that the model was learning effectively from the dataset.
 
-## Testing the Fine-Tuned Model
 
-The original notebook had a small bug where the `tokenizer` variable was overwritten. The following code block shows the corrected way to load your fine-tuned model and run inference.
-
-You can add this code to a new cell at the end of your notebook to test your model's responses.
-
-```python
-from transformers import AutoTokenizer, AutoModelForCausalLM
-import torch
-
-# Load the base model and tokenizer
-model_name = "unsloth/Llama-3.2-3B-Instruct"
-model = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype=torch.bfloat16, device_map="auto")
-tokenizer = AutoTokenizer.from_pretrained(model_name)
-
-# Add the PEFT adapter
-from peft import PeftModel
-model = PeftModel.from_pretrained(model, "finetuned_Llama_model")
-
-# Set up the chat template
-messages = [
-    {"role": "system", "content": "You are a helpful, friendly assistant."},
-    {"role": "user", "content": "What are the three main benefits of using PyTorch?"},
-]
-
-# Apply the chat template and generate a response
-input_ids = tokenizer.apply_chat_template(messages, tokenize=True, add_generation_prompt=True, return_tensors="pt").to("cuda")
-outputs = model.generate(input_ids=input_ids, max_new_tokens=256, use_cache=True)
-response = tokenizer.batch_decode(outputs[:, input_ids.shape[1]:], skip_special_tokens=True)[0]
-
-print(response)
-```
 
 ## Future Improvements
 
