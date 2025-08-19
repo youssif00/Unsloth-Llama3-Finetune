@@ -23,7 +23,7 @@ The goal of this project is to perform Supervised Fine-Tuning (SFT) on a powerfu
 - **🧠 Parameter-Efficient Fine-Tuning (PEFT):** Uses LoRA adapters to train only a small fraction (0.75%) of the model's parameters, preserving the original model's knowledge while adapting it to new data.
 - **💬 Chat-Formatted Data:** The notebook properly formats the dataset into a chat template (`llama-3.1`) for instruction-following tasks.
 - **📊 Training Monitoring:** Integrated with Weights & Biases (`wandb`) for real-time tracking of training loss and other metrics.
-- ** reproducible:** The notebook is self-contained and can be run directly in a Google Colab environment.
+- 
 
 ## Workflow
 
