@@ -43,7 +43,7 @@ You can run this project directly in Google Colab.
 1.  **Open in Google Colab:**
     
 
-2.  **Run the First Cell and Restart:**
+2.  **Run the First Two Cells and Restart:**
     The first code cell sets up the environment to be compatible with the T4 GPU. **You must run this cell first, wait for the runtime to restart automatically, and then proceed to run the rest of the cells from the top, skipping the first one.**
 
 3.  **Provide WandB API Key:**
