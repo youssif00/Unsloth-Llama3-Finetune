@@ -67,12 +67,12 @@ This indicates that the model was learning effectively from the dataset.
 
 - **Train for More Steps:** The model was only trained for 60 steps as a demonstration. Training for more epochs or steps would likely yield better performance.
 - **Merge and Save:** The LoRA adapters can be merged into the base model and saved as a single model for easier deployment.
-
+- **Push to Hub:** The fine-tuned model can be pushed to the Hugging Face Hub for sharing and community use.
+- **Evaluation:** Implement a formal evaluation pipeline using a separate test set to measure performance on metrics like ROUGE, BLEU, or accuracy on specific tasks.
 ## 🤝 Contributing
 Feel free to open issues and pull requests to improve the project!
 
 📄 License This project is licensed under the MIT License. See LICENSE for details.
 
 ✉️ Contact Yossif Reda – yossifreda500@gmail.com
-- **Push to Hub:** The fine-tuned model can be pushed to the Hugging Face Hub for sharing and community use.
-- **Evaluation:** Implement a formal evaluation pipeline using a separate test set to measure performance on metrics like ROUGE, BLEU, or accuracy on specific tasks.
+
