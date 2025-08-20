@@ -41,11 +41,13 @@ The notebook follows a clear, step-by-step process:
 You can run this project directly in Google Colab.
 
 1.  **Open in Google Colab:**
-    
-
-2.  **Run the First Two Cells and Restart:**
-    The first code cell sets up the environment to be compatible with the T4 GPU. **You must run this cell first, wait for the runtime to restart automatically, and then proceed to run the rest of the cells from the top, skipping the first one.**
-
+2. The notebook explicitly sets environment variables before importing transformers/accelerate to disable FlashAttention, for example:
+   ```python
+      import os
+      os.environ["USE_FLASH_ATTENTION"] = "0"
+      os.environ["DISABLE_FLASH_ATTN"] = "1"
+   
+   ```   
 3.  **Provide WandB API Key:**
     When you run the training cell, you will be prompted to enter your Weights & Biases API key to log the training run. You can get your key from [wandb.ai/authorize](https://wandb.ai/authorize).
 
